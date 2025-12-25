@@ -1,59 +1,57 @@
-import React from "react";
-import { Button, Dimensions, StyleSheet, View } from "react-native";
-import Animated, { useSharedValue, withSpring } from "react-native-reanimated";
-const { width } = Dimensions.get("screen");
-const BOX_SIZE = width / 4;
-const STEP = 50;
+import { Button, StyleSheet, View } from "react-native";
+import Animated, {
+	useAnimatedProps,
+	useSharedValue,
+	withSpring,
+} from "react-native-reanimated";
+import Svg, { Circle } from "react-native-svg";
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+
 const index = () => {
-	const translateX = useSharedValue(-width / 2 + BOX_SIZE / 2);
-	const direction = useSharedValue(1); // 1 = sang phải, -1 = sang trái
-	const handlePress = () => {
-		const nextX = translateX.value + STEP * direction.value;
-
-		const rightLimit = width / 2 - BOX_SIZE / 2;
-		const leftLimit = -rightLimit;
-
-		if (nextX > rightLimit || nextX < leftLimit) {
-			// Đảo hướng
-			direction.value *= -1;
-			translateX.value = withSpring(
-				translateX.value + STEP * direction.value,
-			);
-		} else {
-			translateX.value = withSpring(nextX);
-		}
-	};
-	return (
-		<View style={styles.container}>
-			<Animated.View
-				style={[
-					styles.box,
-					{ transform: [{ translateX: translateX }] },
-				]}
-			/>
-			<Button
-				onPress={handlePress}
-				title="Press me!"
-			/>
-		</View>
-	);
 	// const translateX = useSharedValue(0);
-
 	// const handlePress = () => {
-	// 	translateX.value = withSpring(translateX.value + 50);
+	// 	translateX.value += 50;
 	// };
+
+	// const animatedStyle = useAnimatedStyle(() => ({
+	// 	transform: [{ translateX: withSpring(translateX.value) }],
+	// }));
 
 	// return (
 	// 	<View style={styles.container}>
-	// 		<Animated.View
-	// 			style={[styles.box, { transform: [{ translateX }] }]}
-	// 		/>
+	// 		<Animated.View style={[styles.box, animatedStyle]} />
 	// 		<Button
 	// 			onPress={handlePress}
 	// 			title="Click me"
 	// 		/>
 	// 	</View>
 	// );
+	const r = useSharedValue(20);
+
+	const handlePress = () => {
+		r.value += 10;
+	};
+
+	const animatedProps = useAnimatedProps(() => ({
+		r: withSpring(r.value),
+	}));
+
+	return (
+		<View style={styles.container}>
+			<Svg style={styles.svg}>
+				<AnimatedCircle
+					cx="50%"
+					cy="50%"
+					fill="#b58df1"
+					animatedProps={animatedProps}
+				/>
+			</Svg>
+			<Button
+				onPress={handlePress}
+				title="Click me"
+			/>
+		</View>
+	);
 };
 
 export default index;
@@ -65,10 +63,10 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		gap: 20,
 	},
-	box: {
-		width: BOX_SIZE,
+	svg: {
+		width: 100,
 		height: 100,
-		borderRadius: 15,
-		backgroundColor: "violet",
+		// borderRadius: 15,
+		// backgroundColor: "violet",
 	},
 });
